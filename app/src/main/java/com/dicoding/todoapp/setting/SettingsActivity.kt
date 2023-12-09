@@ -8,7 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.dicoding.todoapp.R
+import com.dicoding.todoapp.notification.NotificationWorker
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -48,7 +52,20 @@ class SettingsActivity : AppCompatActivity() {
             val prefNotification = findPreference<SwitchPreference>(getString(R.string.pref_key_notify))
             prefNotification?.setOnPreferenceChangeListener { preference, newValue ->
                 val channelName = getString(R.string.notify_channel_name)
-                //TODO 13 : Schedule and cancel daily reminder using WorkManager with data channelName
+
+                //TODO 13 DONE: Schedule and cancel daily reminder using WorkManager with data channelName
+
+                if(newValue == true){
+                    val mworkManager = WorkManager.getInstance().beginUniqueWork(
+                        channelName,
+                        ExistingWorkPolicy.REPLACE,
+                        OneTimeWorkRequest.from(NotificationWorker::class.java)
+                    )
+                    mworkManager.enqueue()
+                } else {
+                    WorkManager.getInstance().cancelUniqueWork(channelName)
+                }
+
                 true
             }
 

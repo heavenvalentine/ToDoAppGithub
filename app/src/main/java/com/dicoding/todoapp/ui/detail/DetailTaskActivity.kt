@@ -15,7 +15,6 @@ import com.dicoding.todoapp.utils.TASK_ID
 
 class DetailTaskActivity : AppCompatActivity() {
 
-    private lateinit var detailTaskActivity: DetailTaskActivity
     private lateinit var viewModel: DetailTaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,15 +30,16 @@ class DetailTaskActivity : AppCompatActivity() {
         val btnDeleteTask: Button = findViewById(R.id.btn_delete_task)
 
         val factory = ViewModelFactory.getInstance(this)
-        //hubungin activity ini dg viewmodel
-        viewModel = ViewModelProvider(this, factory).get(DetailTaskViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[DetailTaskViewModel::class.java]
 
         viewModel.setTaskId(dataTask)
 
         viewModel.task.observe(this){
-            tvDetailTitle.text = it.title
-            tvDetailDescription.text = it.description
-            tvDetailDate.text = DateConverter.convertMillisToString(it.dueDateMillis)
+            if(it != null) {
+                tvDetailTitle.text = it.title ?: ""
+                tvDetailDescription.text = it.description ?: ""
+                tvDetailDate.text = DateConverter.convertMillisToString(it.dueDateMillis)
+            }
         }
 
         btnDeleteTask.setOnClickListener{
